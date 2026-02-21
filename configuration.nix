@@ -282,7 +282,7 @@
 		prismlauncher
 		javaPackages.compiler.openjdk25
 		lutris
-		# ADD sbpkg
+		# here i ADD pkgs
 	];
 
 	# ----------------- OTHER ENVIRONMENTS ------------------
