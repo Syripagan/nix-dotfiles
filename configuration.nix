@@ -282,6 +282,7 @@
 		prismlauncher
 		javaPackages.compiler.openjdk25
 		lutris
+		countryfetch
 		# here i ADD pkgs
 	];
 
