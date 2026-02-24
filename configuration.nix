@@ -31,12 +31,13 @@
 
 	services = {
 		xserver.enable = true;
-		displayManager.sddm = {
+		displayManager.gdm = {
 			enable = true;
-			wayland.enable = true;
 		};
+		xserver.excludePackages = with pkgs; [ xterm kdePackages.konsole kdePackages.plasma-browser-integration];
 		desktopManager.plasma6.enable = true;
-		xserver.excludePackages = with pkgs; [ xterm ];
+		displayManager.defaultSession = "niri";
+		desktopManager.gnome.enable = false;
 	};
 	services.xserver.videoDrivers = ["nvidia"];
 	hardware.nvidia = {
@@ -71,6 +72,8 @@
 	};
 
 	# -------------------- PROGRAMS ----------------------
+	programs.gamescope.enable = true;
+	programs.niri.enable = true;
 	programs.steam = {
   		enable = true;
   		remotePlay.openFirewall = true;
@@ -208,19 +211,23 @@
 	nixpkgs.config = {
 		allowUnfree = true;
 	};
-
+	system.nixos.label = "thrixOS";
 	xdg.portal = {
-		enable = true;
-		xdgOpenUsePortal = true;
-		config = {
-			common.default = ["gtk"];
-			hyprland.default = ["gtk" "hyprland"];
-		};
-		extraPortals = [
-			pkgs.xdg-desktop-portal-gtk
-			pkgs.xdg-desktop-portal-wlr
-			pkgs.xdg-desktop-portal-hyprland
-		];
+  		enable = true;
+  		wlr.enable = true; 
+  
+  		extraPortals = with pkgs; [
+    			xdg-desktop-portal-gtk
+    			xdg-desktop-portal-hyprland
+  		];
+
+  		config = {
+    			niri = {
+      				"org.freedesktop.impl.portal.ScreenCast" = [ "hyprland" ];
+      				"org.freedesktop.impl.portal.Screenshot" = [ "hyprland" ];
+      				default = [ "gtk" "hyprland" ];
+    			};
+  		};
 	};
 	hardware.bluetooth.enable = true;
 	services.flatpak.enable = true;
@@ -237,14 +244,14 @@
 	  	links2
 	  	telegram-desktop
 	  	kdePackages.dolphin
-	  	blueman
 	  	cava
 	  	discord
 	  	pavucontrol
 	  	xdg-desktop-portal-hyprland
   		xdg-desktop-portal
 	  	xdg-desktop-portal-wlr
-	  	quickshell
+		xdg-desktop-portal-gnome
+		xdg-desktop-portal-gtk
 		ayugram-desktop
 		librewolf
 		wineWowPackages.stagingFull_11
@@ -270,7 +277,6 @@
 		tree
 		gnumake
 		gcc
-		kdePackages.sddm-kcm
 		kdePackages.qt6ct
 		mesa-demos
 		qpwgraph
@@ -283,29 +289,46 @@
 		javaPackages.compiler.openjdk25
 		lutris
 		countryfetch
+		niri
+		xwayland-satellite
+		gnome-keyring
+  		nautilus
+		libreoffice
+		xeyes
+		xwayland-run
+		labwc
+		cage
+		bibata-cursors
+		i3
+		teams-for-linux
+		bluetui
 		# here i ADD pkgs
 	];
 
 	# ----------------- OTHER ENVIRONMENTS ------------------
 	environment = {
 	  	variables = {
-	    		XDG_CURRENT_DESKTOP = "Hyprland";
-	    		XDG_SESSION_TYPE = "wayland";
-	    		XDG_SESSION_DESKTOP = "Hyprland";
 			XDG_DATA_DIRS = lib.mkForce "/etc/xdg:/nix/store/1vkdqgrr7hdqakr0yyllz8r5yji5cz14-desktops/share:/home/syrik2000/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/home/syrik2000/.nix-profile/share:/nix/profile/share:/home/syrik2000/.local/state/nix/profile/share:/etc/profiles/per-user/syrik2000/share:/nix/var/nix/profiles/default/share:/run/current-system/sw/share";
 		};
 		etc."xdg/icons/hicolor/256x256/apps/flicon.png".source = ./flicon.png;
 		etc."xdg/menus/applications.menu".source = "${pkgs.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu";
 		sessionVariables = {
-		MOZ_ENABLE_WAYLAND = "1";
-		NIXOS_OZONE_WL = "1";
-		T_QPA_PLATFORM = "wayland";
-		GDK_BACKEND = "wayland";
-    		WLR_NO_HARDWARE_CURSORS = "1";
+			NIXOS_OZONE_WL = "1";
+    			WLR_NO_HARDWARE_CURSORS = "1";
+		  	XDG_CURRENT_DESKTOP = "niri";
+			XDG_SESSION_TYPE = "wayland";
+			XDG_SESSION_DESKTOP = "niri";
+		};
 	};
-};
-
-# ----------------- SYSTEM VERSION ------------------
-system.stateVersion = "25.11";
+  	environment.etc."os-release".text = ''
+    		NAME="NixOS"
+    		PRETTY_NAME="thrixOS"
+    		ID=nixos
+    		VERSION="25.11 (Xantusia)"
+    		VERSION_ID="25.11"
+  	'';
+	systemd.user.services."xdg-desktop-portal-gnome".enable = true;
+	# ----------------- SYSTEM VERSION ------------------
+	system.stateVersion = "25.11";
 }
 
