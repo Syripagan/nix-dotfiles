@@ -72,6 +72,13 @@
 	};
 
 	# -------------------- PROGRAMS ----------------------
+	programs.obs-studio = {
+		enableVirtualCamera = true;
+		enable = true;
+		plugins = with pkgs.obs-studio-plugins; [
+			obs-composite-blur
+		];
+	};
 	programs.gamescope.enable = true;
 	programs.niri.enable = true;
 	programs.steam = {
@@ -223,9 +230,9 @@
 
   		config = {
     			niri = {
-      				"org.freedesktop.impl.portal.ScreenCast" = [ "hyprland" ];
-      				"org.freedesktop.impl.portal.Screenshot" = [ "hyprland" ];
-      				default = [ "gtk" "hyprland" ];
+      				"org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
+      				"org.freedesktop.impl.portal.Screenshot" = [ "gnome" ];
+      				default = [ "gtk" "gnome" ];
     			};
   		};
 	};
@@ -284,7 +291,6 @@
 		lsd
 		wlr-randr
 		vscodium
-		obs-studio
 		prismlauncher
 		javaPackages.compiler.openjdk25
 		lutris
@@ -302,6 +308,20 @@
 		i3
 		teams-for-linux
 		bluetui
+		cargo
+		pkg-config
+		alsa-lib
+		systemd
+		libxkbcommon
+		rustfmt
+		pre-commit
+		rustPackages.clippy
+		vulkan-loader
+		libudev-zero
+		gimp
+		lugaru
+		python313
+		qbittorrent
 		# here i ADD pkgs
 	];
 
@@ -320,14 +340,9 @@
 			XDG_SESSION_DESKTOP = "niri";
 		};
 	};
-  	environment.etc."os-release".text = ''
-    		NAME="NixOS"
-    		PRETTY_NAME="thrixOS"
-    		ID=nixos
-    		VERSION="25.11 (Xantusia)"
-    		VERSION_ID="25.11"
-  	'';
+	system.nixos.distroName = "ThrixOS";
 	systemd.user.services."xdg-desktop-portal-gnome".enable = true;
+
 	# ----------------- SYSTEM VERSION ------------------
 	system.stateVersion = "25.11";
 }
