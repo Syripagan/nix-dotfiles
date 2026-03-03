@@ -10,7 +10,7 @@
       			url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
       			inputs.nixpkgs.follows = "nixpkgs";
     		};
-
+		wooz.url = "github:negrel/wooz";
     		qml-niri = {
       			url = "github:imiric/qml-niri/main";
       			inputs.nixpkgs.follows = "nixpkgs";
@@ -18,7 +18,7 @@
     		};
   	};
 
-  	outputs = { self, nixpkgs, nix-software-center, qml-niri, quickshell, ... }:
+  	outputs = { self, nixpkgs, nix-software-center, qml-niri, quickshell, wooz, ... }:
   	let
     		system = "x86_64-linux";
     		pkgs = import nixpkgs { inherit system; };
@@ -34,6 +34,7 @@
 						nix-software-center.packages.${system}.default
 						qml-niri.packages.${system}.default
 						quickshell.packages.${system}.default
+						wooz.packages.${system}.default
 					];
         			}
       			];

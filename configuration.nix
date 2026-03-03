@@ -1,7 +1,3 @@
-# Edit this configuration file to define what should be installed on
-# your system. Help is available in the configuration.nix(5) man page, on
-# https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-
 { config, lib, pkgs, ... }:
 	{
   		imports =
@@ -12,10 +8,24 @@
 	# ------------------- LINUX KERNEL ------------------------
 	boot.kernelPackages = pkgs.linuxPackages_6_18;
 
-	# ------------------- TIMEZONE CONF -----------------------
+	# -------------------- BOOT CONFIG ------------------------
 	boot.loader.grub.enable = true;
-	boot.loader.grub.device = "/dev/nvme0n1";
-	boot.loader.grub.useOSProber = true;
+	boot.loader.grub.version = 2;
+	boot.loader.grub.devices = [ "nodev" ];
+	boot.loader.efi.canTouchEfiVariables = true;
+	boot.loader.grub.efiSupport = true;
+	fileSystems."/boot" = {
+  		device = "/dev/nvme0n1p1";
+  		fsType = "vfat";
+	};
+	boot.loader.grub.theme = "/boot/grub/themes/thrix";
+ 	boot.plymouth.enable = true;
+	boot.plymouth.theme = "bgrt";
+	boot.initrd.verbose = false; 
+	boot.consoleLogLevel = 0;
+	boot.kernelParams = [ "quiet" "udev.log_level=0" ];
+
+	# ------------------- TIMEZONE CONF -----------------------
   	time.timeZone = "Europe/Kyiv";
 
 	# -------------------- NVIDIA DROVA -----------------------
@@ -26,9 +36,12 @@
 	# ------------------------ NIX ----------------------------
 	nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-	# --------------------- SERVICES --------------------------
+	# ----------------- SERVICES + RULES ----------------------
 	services.logmein-hamachi.enable = true;
-
+	services.udev.extraRules = ''
+  		# Виключити інтегрований блютузь
+  		SUBSYSTEM=="usb", ATTR{idVendor}=="8087", ATTR{idProduct}=="0026", ATTR{authorized}="0"
+	'';
 	services = {
 		xserver.enable = true;
 		displayManager.gdm = {
@@ -46,7 +59,7 @@
 		powerManagement.finegrained = false;
 		open = true;
 		nvidiaSettings = true;
-		package = config.boot.kernelPackages.nvidiaPackages.latest;
+		package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
 	};
 	services.xserver.xkb.layout = "us";
 	services.pipewire = {
@@ -57,7 +70,14 @@
 		jack.enable = true;
 		wireplumber.enable = true;
 	};
-
+	
+	hardware.bluetooth.enable = true;
+	services.pipewire.wireplumber.extraConfig.bluetoothDisableHfp = {
+  		"monitor.bluez.properties" = {
+    			"bluez5.enable-hfp" = false;
+    			"bluez5.enable-hsp" = false;
+  		};
+	};
 	# ------------------ NETWORKING ----------------------
 	networking.networkmanager.enable = true;
 
@@ -236,7 +256,6 @@
     			};
   		};
 	};
-	hardware.bluetooth.enable = true;
 	services.flatpak.enable = true;
 
 	# ---------------- HERE ARE SYRI PKGS ---------------
@@ -322,6 +341,11 @@
 		lugaru
 		python313
 		qbittorrent
+		usbutils
+		pciutils
+		plymouth
+		nixos-bgrt-plymouth
+		android-tools
 		# here i ADD pkgs
 	];
 
